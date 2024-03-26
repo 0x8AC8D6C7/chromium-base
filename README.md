@@ -20,8 +20,10 @@ from the Google Chromium. That code include:
 ```bash
 mkdir build
 cmake ..
-# 并行构建
+# 方法1：并行构建，适用于Cmake 3.12及以上版本
 cmake --build . --config Debug --target all --parallel 8
+# 方法2：使用make
+make -j8
 ```
 ### macOS
 Require:
