@@ -49,3 +49,4 @@
 *.ipdb
 
 cmake-build
+build

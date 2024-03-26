@@ -15,7 +15,14 @@ from the Google Chromium. That code include:
 ### Linux
 要求: CMake 3.6或更高版本，GCC 7.3或更高版本。  
 1. 需要链接glib，有些Linux发行版不带glib，需要自行安装，安装之后需要修改CMakeLists.txt中BASE\_INCLUDE\_PLATFORM\_DIRECTORIES这个变量所定义的glib头文件目录。
-2. 进入scm目录，运行build\_base\_linux.sh脚本编译即可。
+2. 构建（推荐使用VSCode的Cmake插件，可一键构建）
+3. 命令行方式构建
+```bash
+mkdir build
+cmake ..
+# 并行构建
+cmake --build . --config Debug --target all --parallel 8
+```
 ### macOS
 Require:
 
