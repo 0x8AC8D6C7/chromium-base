@@ -22,6 +22,7 @@ mkdir build && cd build
 cmake ..
 make
 sudo make install
+cd ../.. && rm -rf libevent # Optional
 ```
 2. gtest
 ```bash
@@ -31,6 +32,7 @@ mkdir build && cd build
 cmake ..
 make
 sudo make install
+cd ../.. && rm -rf googletest # Optional
 ```
 3. glib
 ```bash
@@ -50,8 +52,6 @@ cmake --build . --config Debug --target all --parallel 8
 # 方法2：使用make
 make -j8
 ```
-### macOS
-Require:
 
 ## 如何使用
 包含 ```base\base_export.h```文件或其他模块的头文件，链接base.dll/libbase.so即可。
