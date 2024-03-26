@@ -13,7 +13,7 @@ from the Google Chromium. That code include:
 要求: VS 2017 15.9或更高版本.  
 打开 chromium-base\src\base.sln 文件之后选择目的平台直接编译即可.
 ### Linux
-环境：
+#### 环境：
 1. libevent
 ```bash
 git clone https://github.com/libevent/libevent.git
@@ -37,7 +37,7 @@ sudo make install
 sudo apt update
 sudo apt install libglib2.0-dev
 ```
-2. 
+#### 构建
 要求: CMake 3.6或更高版本，GCC 7.3或更高版本。  
 1. 需要链接glib，有些Linux发行版不带glib，需要自行安装，安装之后需要修改CMakeLists.txt中BASE\_INCLUDE\_PLATFORM\_DIRECTORIES这个变量所定义的glib头文件目录。
 2. 构建方式1：（推荐使用VSCode的Cmake插件，可一键构建）
