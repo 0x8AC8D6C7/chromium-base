@@ -47,3 +47,5 @@
 *.tmp
 *.iobj
 *.ipdb
+
+cmake-build

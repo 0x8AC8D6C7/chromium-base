@@ -8,6 +8,43 @@ set(BASE_TARGET_NAME "base")
 set(CMAKE_CXX_COMPILER g++)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17")
 
+
+# 设置 BASE_ARCH_PLATFORM 的默认值
+if(NOT DEFINED BASE_ARCH_PLATFORM)
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "x86_64")
+        set(BASE_ARCH_PLATFORM "x64")
+    elseif(CMAKE_SYSTEM_PROCESSOR MATCHES "x86")
+        set(BASE_ARCH_PLATFORM "x86")
+    else()
+        message(FATAL_ERROR "Unsupported processor: ${CMAKE_SYSTEM_PROCESSOR}")
+    endif()
+endif()
+
+# 设置 BASE_BUILD_PLATFORM 的默认值
+if(NOT DEFINED BASE_BUILD_PLATFORM)
+    if(UNIX AND NOT APPLE)
+        set(BASE_BUILD_PLATFORM "Linux")
+    else()
+        message(FATAL_ERROR "Unsupported platform")
+    endif()
+endif()
+
+# 设置默认构建类型为 Release，如果没有通过命令行指定
+if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
+    set(CMAKE_BUILD_TYPE "Release" CACHE STRING "Choose the type of build." FORCE)
+    # Set the possible values of build type for cmake-gui
+    set_property(CACHE CMAKE_BUILD_TYPE PROPERTY STRINGS "Debug" "Release" "MinSizeRel" "RelWithDebInfo")
+endif()
+
+# 使用变量
+message(STATUS "Building for: ${BASE_BUILD_PLATFORM} ${BASE_ARCH_PLATFORM} ${CMAKE_BUILD_TYPE}")
+
+
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin/base/${ARCH_PLATFORM_NAME}/Debug)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin/base/${ARCH_PLATFORM_NAME}/Release)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_DEBUG ${CMAKE_BINARY_DIR}/bin/base/${ARCH_PLATFORM_NAME}/Debug)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY_RELEASE ${CMAKE_BINARY_DIR}/bin/base/${ARCH_PLATFORM_NAME}/Release)
+
 if(x86 MATCHES ${BASE_ARCH_PLATFORM})
     if(Linux MATCHES ${BASE_BUILD_PLATFORM} OR Android MATCHES ${BASE_BUILD_PLATFORM})
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -m32")
@@ -69,8 +106,8 @@ if(Linux MATCHES ${BASE_BUILD_PLATFORM})
     )
 
     set(BASE_INCLUDE_PLATFORM_DIRECTORIES   
-        /usr/local/include/glib-2.0
-        /usr/local/lib/glib-2.0/include
+    /usr/include/glib-2.0
+    /usr/lib/x86_64-linux-gnu/glib-2.0/include # for glibconfig.h
     )
 
     set(BASE_PLATFORM_SOURCE  
@@ -120,6 +157,7 @@ if(Linux MATCHES ${BASE_BUILD_PLATFORM})
         base/files/file_path_watcher_linux.cc
         base/third_party/nspr/prcpucfg_linux.h
         base/message_pump_libevent.h
+        base/message_pump_libevent.cc
         base/debug/debugger_posix.cc
     )
 endif()
@@ -476,7 +514,8 @@ set(BASE_SOURCE
     base/bind_helpers.cc
     base/build_time.cc
     base/callback_internal.cc
-    base/check_example.cc
+    # FUCK, 'check_example.cc' has a main function definition 
+    # base/check_example.cc
     base/command_line.cc
     base/cpu.cc
     base/debug/alias.cc
@@ -578,14 +617,27 @@ link_directories(
     ${BASE_LINK_DIRECTORIES}
 )
 
+find_package(Libevent REQUIRED)
+
 add_library(${BASE_TARGET_NAME} ${BASE_BUILD_CONFIGURATION_TYPE}
     ${BASE_SOURCE}
     ${BASE_PLATFORM_SOURCE}
 )
 
+install(TARGETS base
+    LIBRARY DESTINATION bin/base/${ARCH_PLATFORM_NAME}/Debug
+    CONFIGURATIONS Debug
+)
+
+install(TARGETS base
+    LIBRARY DESTINATION bin/base/${ARCH_PLATFORM_NAME}/Release
+    CONFIGURATIONS Release
+)
+
 target_link_libraries(${BASE_TARGET_NAME}
     ${BASE_LINK_LIBRARIES}
     ${BASE_LINK_PLATFORM_LIBRARIES}
+    event
 )
 
 set_property(TARGET ${BASE_TARGET_NAME} PROPERTY POSITION_INDEPENDENT_CODE ON)
